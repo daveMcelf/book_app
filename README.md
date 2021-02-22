@@ -1,16 +1,26 @@
 # book_app
 
-A new Flutter project.
+Flutter Book App project using Provider.
 
 ## Getting Started
+- Install Flutter and make sure everything is up and running: [documentation](https://flutter.dev/docs)
+- Install packages in `pubspec.yaml`:
+```
+flutter pub get
+```
+- Run the app
 
-This project is a starting point for a Flutter application.
+** Due to iOS 14.
 
-A few resources to get you started if this is your first Flutter project:
+## Features
+- API connection with `http` package
+- Persist storing data with `shared_preferences`
+- Using `Isolate` to parse data in background thread to prevent working in Main thread => faster app starttime
+- Cache HTTP data with File using `path_provider`
+- Using `provider` for state management
+- Open url browser within the app
+- Textfield debounce for preventing flooding API request
+- Infinite List scrolling
+- Include Widget and Unit Testing
+- Documentation to describe functions is include in each file
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
