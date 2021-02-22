@@ -23,6 +23,7 @@ class BookDetailPage extends StatelessWidget {
         ),
       ),
       body: SafeArea(
+        bottom: false,
         child: ChangeNotifierProvider(
           create: (_) => BookDetailViewModel(book, context),
           builder: (context, widget) {
@@ -31,7 +32,7 @@ class BookDetailPage extends StatelessWidget {
                 child: model.isLoading
                     ? CupertinoActivityIndicator()
                     : Container(
-                        margin: EdgeInsets.all(15),
+                        margin: EdgeInsets.only(left: 15, right: 15, top: 15),
                         child: Stack(
                           children: [
                             SingleChildScrollView(
@@ -45,11 +46,8 @@ class BookDetailPage extends StatelessWidget {
                                     child: Image.network(
                                       model.book.image,
                                       fit: BoxFit.cover,
-                                      width: MediaQuery.of(context).size.width /
-                                          1.3,
-                                      height:
-                                          MediaQuery.of(context).size.width /
-                                              1.3,
+                                      width: MediaQuery.of(context).size.width,
+                                      height: MediaQuery.of(context).size.width,
                                       loadingBuilder: (BuildContext context,
                                           Widget child,
                                           ImageChunkEvent loadingProgress) {
@@ -74,12 +72,14 @@ class BookDetailPage extends StatelessWidget {
                                           child: Icon(Icons.error),
                                         );
                                       },
-                                      cacheHeight:
-                                          MediaQuery.of(context).size.width ~/
-                                              2,
-                                      cacheWidth:
-                                          MediaQuery.of(context).size.width ~/
-                                              2,
+                                      cacheHeight: MediaQuery.of(context)
+                                          .size
+                                          .width
+                                          .floor(),
+                                      cacheWidth: MediaQuery.of(context)
+                                          .size
+                                          .width
+                                          .floor(),
                                     ),
                                   ),
                                   Container(
@@ -129,6 +129,8 @@ class BookDetailPage extends StatelessWidget {
                                                   style: TextStyle(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.bold,
+                                                    decoration: TextDecoration
+                                                        .underline,
                                                   ),
                                                 ),
                                             ],
@@ -235,7 +237,7 @@ class BookDetailPage extends StatelessWidget {
                               ),
                             ),
                             Positioned(
-                              bottom: 0,
+                              bottom: 15,
                               left: 0,
                               right: 0,
                               child: Center(
