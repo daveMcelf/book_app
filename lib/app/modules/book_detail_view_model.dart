@@ -73,6 +73,7 @@ class BookDetailViewModel with ChangeNotifier {
           ),
           TextButton(
             onPressed: () async {
+              /// update current note and save to safepreference
               note = noteController.text;
               Provider.of<NotePrefsNotifier>(context, listen: false)
                   .addNewNote(book.isbn13, noteController.text);

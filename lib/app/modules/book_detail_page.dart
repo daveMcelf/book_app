@@ -45,6 +45,11 @@ class BookDetailPage extends StatelessWidget {
                                     child: Image.network(
                                       model.book.image,
                                       fit: BoxFit.cover,
+                                      width: MediaQuery.of(context).size.width /
+                                          1.3,
+                                      height:
+                                          MediaQuery.of(context).size.width /
+                                              1.3,
                                       loadingBuilder: (BuildContext context,
                                           Widget child,
                                           ImageChunkEvent loadingProgress) {
@@ -69,6 +74,12 @@ class BookDetailPage extends StatelessWidget {
                                           child: Icon(Icons.error),
                                         );
                                       },
+                                      cacheHeight:
+                                          MediaQuery.of(context).size.width ~/
+                                              2,
+                                      cacheWidth:
+                                          MediaQuery.of(context).size.width ~/
+                                              2,
                                     ),
                                   ),
                                   Container(

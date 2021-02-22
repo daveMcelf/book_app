@@ -1,4 +1,4 @@
-import 'package:book_app/app/helper/scrolling_list_item.dart';
+import 'package:book_app/app/modules/scrolling_list_item.dart';
 import 'package:book_app/app/modules/search_view_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -80,8 +80,10 @@ class SearchPage extends StatelessWidget {
                                 },
                                 itemCreated: () {
                                   SchedulerBinding.instance
-                                      .addPostFrameCallback((duration) =>
-                                          model.handleItemCreated(index));
+                                      .addPostFrameCallback(
+                                    (duration) =>
+                                        model.handleItemCreated(index),
+                                  );
                                 },
                               );
                             },

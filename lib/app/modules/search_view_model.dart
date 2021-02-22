@@ -13,6 +13,8 @@ class SearchViewModel with ChangeNotifier {
   int kLIMIT = 10;
   int _currentPage = 1;
   String searchString;
+  // hacky way to show indicator
+  final loadingIndicatorItem = BookSnapshot(title: "*^^*");
 
   /// fetch book data using query string and page
   Future<void> fetchBook(String query, String page) async {
@@ -20,10 +22,12 @@ class SearchViewModel with ChangeNotifier {
     final res = await BookAPIClient.instance.searchBook(query, page: page);
 
     if (res != null) {
-      if (page == "1")
+      if (page == "1") {
         books = res.books;
-      else
+        _currentPage = 1;
+      } else {
         books.addAll(res.books);
+      }
       notifyListeners();
     } else {
       searchString = "";
@@ -38,7 +42,10 @@ class SearchViewModel with ChangeNotifier {
 
   /// Method to set Loading state of the model
   void setLoading(bool state) {
-    isLoadingMoreData = state;
+    if (state)
+      books.add(loadingIndicatorItem);
+    else
+      books.remove(loadingIndicatorItem);
     notifyListeners();
   }
 
