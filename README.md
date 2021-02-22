@@ -10,7 +10,7 @@ flutter pub get
 ```
 - Run the app
 
-** Due to iOS 14.
+** In IOS 14 update, There might be some issue when debug the app on devices. However, running in Simulator and Build using Xcode should still worked. See [IOS 14 Notice](https://flutter.dev/docs/development/ios-14)
 
 ## Features
 - API connection with `http` package
