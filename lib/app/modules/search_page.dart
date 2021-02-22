@@ -12,7 +12,8 @@ class SearchPage extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: GestureDetector(
-          onTapDown: (_) {
+          behavior: HitTestBehavior.opaque,
+          onPanDown: (_) {
             FocusScope.of(context).unfocus();
           },
           child: ChangeNotifierProvider(

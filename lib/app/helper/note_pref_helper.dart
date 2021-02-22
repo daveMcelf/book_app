@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +20,11 @@ class NotePrefsState {
 class NotePrefsNotifier with ChangeNotifier {
   NotePrefsState _currentPrefs = NotePrefsState(notes: {});
 
+  Isolate _isolate;
+  ReceivePort _receivePort; //main isolate for listening data
+
   NotePrefsNotifier() {
+    _receivePort = ReceivePort();
     _loadSharedPrefs();
   }
 
@@ -33,19 +39,48 @@ class NotePrefsNotifier with ChangeNotifier {
     _saveNewPrefs();
   }
 
+  /// load all note data from sharePreferences.
+  ///
+  /// After receiving the note data, convert it to [NotePrefsState] in background using isolate
   Future<void> _loadSharedPrefs() async {
     var sharedPrefs = await SharedPreferences.getInstance();
     var notesString = sharedPrefs.getString('notes') ?? null;
+
     if (notesString != null) {
-      var s = json.decode(notesString);
-      Map<String, String> newMap = Map<String, String>.from(s);
-      _currentPrefs = NotePrefsState(notes: newMap);
-      notifyListeners();
+      //parse note data in isolate background here to have faster runtime
+      _isolate = await Isolate.spawn(_isolateHandler,
+          JsonParseThreadModel(_receivePort.sendPort, notesString));
+      _receivePort.listen((message) {
+        log("done parsing note data");
+        _currentPrefs = NotePrefsState(notes: message);
+        notifyListeners();
+      }, onDone: () {
+        /// kill isolate and close port
+        _isolate.kill();
+        _receivePort.close();
+      });
     }
   }
 
+  /// save note data into sharepreferences
   Future<void> _saveNewPrefs() async {
     var sharedPrefs = await SharedPreferences.getInstance();
     await sharedPrefs.setString('notes', json.encode(_currentPrefs.notes));
   }
+
+  static void _isolateHandler(JsonParseThreadModel param) async {
+    assert(param.data is String);
+    var parse = json.decode(param.data);
+    Map<String, String> noteData = Map<String, String>.from(parse);
+    param.sendPort.send(noteData);
+  }
+}
+
+/// Model used for working with isolate.
+///
+/// This Model add additional data along with SendPort before passing to spawn isolate function
+class JsonParseThreadModel {
+  SendPort sendPort;
+  String data;
+  JsonParseThreadModel(this.sendPort, this.data);
 }

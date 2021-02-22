@@ -11,7 +11,9 @@ class BookDetailViewModel with ChangeNotifier {
   BookDetail book;
   bool isLoading = false;
   String note = "";
-  BookDetailViewModel(BookSnapshot book) {
+  BookDetailViewModel(BookSnapshot book, BuildContext context) {
+    note = Provider.of<NotePrefsNotifier>(context, listen: false)
+        .notes[book.isbn13];
     fetchBookDetail(book.isbn13);
   }
 
@@ -34,8 +36,6 @@ class BookDetailViewModel with ChangeNotifier {
 
   /// Show a dialog for add a note to the book
   showMaterialDialog(BuildContext context) {
-    var note = Provider.of<NotePrefsNotifier>(context, listen: false)
-        .notes[book.isbn13];
     final TextEditingController noteController = new TextEditingController();
     showDialog(
       context: context,
@@ -73,8 +73,10 @@ class BookDetailViewModel with ChangeNotifier {
           ),
           TextButton(
             onPressed: () async {
+              note = noteController.text;
               Provider.of<NotePrefsNotifier>(context, listen: false)
                   .addNewNote(book.isbn13, noteController.text);
+              notifyListeners();
               Navigator.of(context).pop();
             },
             child: Text(

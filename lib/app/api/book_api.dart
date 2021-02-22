@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
 
 import 'package:book_app/app/helper/api_exception.dart';
-import 'package:book_app/app/helper/network_cache/network_cache.dart';
+import 'package:book_app/app/helper/network_cache/file_cache.dart';
 import 'package:book_app/app/models/book.dart';
 import 'package:book_app/app/models/book_detail.dart';
 import 'package:http/http.dart' as http;
@@ -28,17 +27,17 @@ class BookAPIClient {
     final cacheData = await _cacheManager.getCachedData("cache-$url");
     if (cacheData != null && cacheData.isNotEmpty) {
       print("From Cache");
-      // Isolate.spawn(parseSearchResponse, cacheData).then((isolate) {
-      //   return isolate.
-      // });
       return BookSearchRespnse.fromJson(jsonDecode(cacheData));
     }
 
     try {
       var response = await http.get(url);
       if (response.statusCode == 200) {
-        var resBody = _response(response);
-        BookSearchRespnse res = BookSearchRespnse.fromJson(resBody);
+        _checkResponse(response.statusCode);
+
+        BookSearchRespnse res =
+            BookSearchRespnse.fromJson(jsonDecode(response.body));
+
         _cacheManager.writeDataToCached(
             "cache-$url", response.body, Duration(hours: 1));
         return res;
@@ -63,8 +62,8 @@ class BookAPIClient {
       var response = await http.get(url);
 
       if (response.statusCode == 200) {
-        var resBody = _response(response);
-        BookDetail res = BookDetail.fromJson(resBody);
+        _checkResponse(response.statusCode);
+        BookDetail res = BookDetail.fromJson(jsonDecode(response.body));
         _cacheManager.writeDataToCached(
             "cache-$url", response.body, Duration(hours: 1));
         return res;
@@ -77,11 +76,10 @@ class BookAPIClient {
     }
   }
 
-  dynamic _response(http.Response response) {
-    switch (response.statusCode) {
+  _checkResponse(int statusCode) {
+    switch (statusCode) {
       case 200:
-        var responseJson = json.decode(response.body.toString());
-        return responseJson;
+        return;
       case 400:
         throw BookAPIException(400, "Bad Request");
       case 401:
@@ -90,13 +88,7 @@ class BookAPIClient {
       case 500:
         throw BookAPIException(500, "Server Error");
       default:
-        throw BookAPIException(response.statusCode, 'Unknowd Error');
+        throw BookAPIException(statusCode, 'Unknowd Error');
     }
-  }
-
-  static BookSearchRespnse parseSearchResponse(String response) {
-    assert(response is String);
-    var parse = json.decode(response);
-    return BookSearchRespnse.fromJson(parse);
   }
 }

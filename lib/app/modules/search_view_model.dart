@@ -57,7 +57,6 @@ class SearchViewModel with ChangeNotifier {
     var itemPosition = index + 1;
     var requestMoreData = itemPosition % kLIMIT == 0 && itemPosition != 0;
     var pageToRequest = (itemPosition ~/ kLIMIT) + 1;
-    print(pageToRequest);
     if (requestMoreData && pageToRequest > _currentPage) {
       _currentPage = pageToRequest;
       setLoading(true);

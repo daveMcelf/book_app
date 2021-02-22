@@ -5,26 +5,68 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:book_app/app/helper/star_rating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:book_app/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+  Widget _wrapWithMaterialApp(Widget testWidget) {
+    return MaterialApp(
+      home: Scaffold(body: testWidget),
+    );
+  }
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('when star is 0', (WidgetTester tester) async {
+    // Test code goes here.
+    await tester.pumpWidget(_wrapWithMaterialApp(StarRatingWidget(
+      star: 0,
+    )));
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    final emptyStarFinder = find.byIcon(Icons.star_border);
+    final starFinder = find.byIcon(Icons.star);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(emptyStarFinder, findsNWidgets(5));
+    expect(starFinder, findsNWidgets(0));
+  });
+
+  testWidgets('when star is in range 1-5', (WidgetTester tester) async {
+    // Test code goes here.
+    await tester.pumpWidget(_wrapWithMaterialApp(StarRatingWidget(
+      star: 3,
+    )));
+
+    final emptyStarFinder = find.byIcon(Icons.star_border);
+    final starFinder = find.byIcon(Icons.star);
+
+    expect(emptyStarFinder, findsNWidgets(2));
+    expect(starFinder, findsNWidgets(3));
+  });
+
+  testWidgets('when star less than 0, star should be 0',
+      (WidgetTester tester) async {
+    // Test code goes here.
+    await tester.pumpWidget(_wrapWithMaterialApp(StarRatingWidget(
+      star: -1,
+    )));
+
+    final emptyStarFinder = find.byIcon(Icons.star_border);
+    final starFinder = find.byIcon(Icons.star);
+
+    expect(emptyStarFinder, findsNWidgets(5));
+    expect(starFinder, findsNWidgets(0));
+  });
+
+  testWidgets('when star larger than 5, star should display 5',
+      (WidgetTester tester) async {
+    // Test code goes here.
+    await tester.pumpWidget(_wrapWithMaterialApp(StarRatingWidget(
+      star: 10,
+    )));
+
+    final emptyStarFinder = find.byIcon(Icons.star_border);
+    final starFinder = find.byIcon(Icons.star);
+
+    expect(emptyStarFinder, findsNWidgets(0));
+    expect(starFinder, findsNWidgets(5));
   });
 }

@@ -9,7 +9,10 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => NotePrefsNotifier()),
+        ChangeNotifierProvider(
+          create: (_) => NotePrefsNotifier(),
+          lazy: false,
+        ),
       ],
       child: MyApp(),
     ),

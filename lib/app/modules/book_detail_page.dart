@@ -14,7 +14,6 @@ class BookDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // backgroundColor: Colors.white,
         title: Text("Detail"),
         leading: IconButton(
           icon: Icon(Icons.chevron_left),
@@ -25,7 +24,7 @@ class BookDetailPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: ChangeNotifierProvider(
-          create: (_) => BookDetailViewModel(book),
+          create: (_) => BookDetailViewModel(book, context),
           builder: (context, widget) {
             return Consumer<BookDetailViewModel>(builder: (context, model, _) {
               return Center(
@@ -33,155 +32,202 @@ class BookDetailPage extends StatelessWidget {
                     ? CupertinoActivityIndicator()
                     : Container(
                         margin: EdgeInsets.all(15),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                alignment: Alignment.center,
-                                child: Image.network(
-                                  model.book.image,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Container(
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            model.book.price,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.green,
-                                            ),
+                        child: Stack(
+                          children: [
+                            SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.width,
+                                    child: Image.network(
+                                      model.book.image,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (BuildContext context,
+                                          Widget child,
+                                          ImageChunkEvent loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height:
+                                              MediaQuery.of(context).size.width,
+                                          child: Center(
+                                            child: CupertinoActivityIndicator(),
                                           ),
-                                          SizedBox(height: 10),
-                                          Text(
-                                            model.book.title,
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          SizedBox(height: 5),
-                                          Text(
-                                            model.book.authors,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0xFFb7b7a4),
-                                              height: 1.6,
-                                            ),
-                                          ),
-                                          SizedBox(height: 10),
-                                          StarRatingWidget(
-                                            star: int.parse(model.book.rating),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    RawMaterialButton(
-                                      onPressed: () async {
-                                        if (await canLaunch(model.book.url)) {
-                                          await launch(model.book.url);
-                                        } else {
-                                          throw 'Could not launch ${model.book.url}';
-                                        }
+                                        );
                                       },
-                                      fillColor: Colors.white,
-                                      child: Icon(
-                                        Icons.link,
-                                      ),
-                                      shape: CircleBorder(),
+                                      errorBuilder: (ctx, obj, err) {
+                                        return Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height:
+                                              MediaQuery.of(context).size.width,
+                                          child: Icon(Icons.error),
+                                        );
+                                      },
                                     ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Color(0xFFe5e5e5),
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 15, horizontal: 15),
-                                child: Row(
-                                  children: [
-                                    Flexible(
-                                      flex: 1,
-                                      fit: FlexFit.tight,
-                                      child: Column(
-                                        children: [
-                                          Text("Year"),
-                                          SizedBox(
-                                            height: 5,
+                                  ),
+                                  Container(
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                model.book.price,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.green,
+                                                ),
+                                              ),
+                                              SizedBox(height: 10),
+                                              Text(
+                                                model.book.title,
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5),
+                                              Text(
+                                                model.book.authors,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFFb7b7a4),
+                                                  height: 1.6,
+                                                ),
+                                              ),
+                                              SizedBox(height: 10),
+                                              StarRatingWidget(
+                                                star: int.parse(
+                                                    model.book.rating),
+                                              ),
+                                              SizedBox(height: 10),
+                                              if (model?.note?.isNotEmpty ??
+                                                  false)
+                                                Text(
+                                                  "My note: " + model.note,
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                            ],
                                           ),
-                                          Text(
-                                            "${model.book.year}",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              height: 1.6,
-                                            ),
+                                        ),
+                                        RawMaterialButton(
+                                          onPressed: () async {
+                                            if (await canLaunch(
+                                                model.book.url)) {
+                                              await launch(model.book.url);
+                                            } else {
+                                              throw 'Could not launch ${model.book.url}';
+                                            }
+                                          },
+                                          fillColor: Colors.white,
+                                          child: Icon(
+                                            Icons.link,
                                           ),
-                                        ],
-                                      ),
+                                          shape: CircleBorder(),
+                                        ),
+                                      ],
                                     ),
-                                    Flexible(
-                                      flex: 2,
-                                      fit: FlexFit.tight,
-                                      child: Column(
-                                        children: [
-                                          Text("Number of pages"),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(
-                                            "${model.book.pages}",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              height: 1.6,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: Color(0xFFe5e5e5),
                                     ),
-                                    Flexible(
-                                      flex: 1,
-                                      fit: FlexFit.tight,
-                                      child: Column(
-                                        children: [
-                                          Text("Language"),
-                                          SizedBox(
-                                            height: 5,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 15),
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                          flex: 1,
+                                          fit: FlexFit.tight,
+                                          child: Column(
+                                            children: [
+                                              Text("Year"),
+                                              SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                "${model.book.year}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  height: 1.6,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            "${model.book.language}",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              height: 1.6,
-                                            ),
+                                        ),
+                                        Flexible(
+                                          flex: 2,
+                                          fit: FlexFit.tight,
+                                          child: Column(
+                                            children: [
+                                              Text("Number of pages"),
+                                              SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                "${model.book.pages}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  height: 1.6,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
+                                        ),
+                                        Flexible(
+                                          flex: 1,
+                                          fit: FlexFit.tight,
+                                          child: Column(
+                                            children: [
+                                              Text("Language"),
+                                              SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                "${model.book.language}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  height: 1.6,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                  Text(
+                                    model.book.desc,
+                                    style: TextStyle(
+                                      height: 1.6,
+                                      color: Color(0xFF594236),
+                                    ),
+                                  ),
+                                  SizedBox(height: 80),
+                                ],
                               ),
-                              SizedBox(height: 20),
-                              Text(
-                                model.book.desc,
-                                style: TextStyle(
-                                  height: 1.6,
-                                  color: Color(0xFF594236),
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                              Center(
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Center(
                                 child: Container(
                                   height: 50,
                                   width: 200,
@@ -202,9 +248,8 @@ class BookDetailPage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 20),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
               );
