@@ -15,7 +15,7 @@ flutter pub get
 ## Features
 - API connection with `http` package
 - Persist storing data with `shared_preferences`
-- Using `Isolate` to parse data in background thread to prevent working in Main thread => faster app starttime
+- Using `Isolate` to parse data in different thread to prevent working in Main thread => faster app starttime
 - Cache HTTP data with File using `path_provider`
 - Using `provider` for state management
 - Open url browser within the app
